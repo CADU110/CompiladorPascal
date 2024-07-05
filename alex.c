@@ -3,7 +3,7 @@
 #include <ctype.h>
 #include <string.h>
 
-#define MAX 256
+#define MAX 100000
 
 typedef enum Estados{
   Inicio,
@@ -51,7 +51,7 @@ Tipos verificar(char c) {
     return Identificador;
   } else if (c == '+' || c == '-' || c == '*' || c == '/' || c== '<' || c=='>' || c=='=') {
     return Operador;
-  } else if (c == ';' || c == '.' || c == '(' || c == ')' || c == '{' || c == '}' || c == '[' || c==']' || c==',' || c==':') {
+  } else if (c == ';' || c == '.' || c == '(' || c == ')'|| c == '[' || c==']' || c==',' || c==':') {
     return Separador;
   } else {
     return Nao_identificado;
@@ -85,10 +85,10 @@ void alex(FILE *arquivo,Qtd *qtd){
   qtd->keyword = 0;
   qtd->numb = 0;
   qtd->op = 0;
-  qtd->cop;
-  qtd->delim;
-  qtd->coments;
-  qtd->uk;
+  qtd->cop=0;
+  qtd->delim=0;
+  qtd->coments=0;
+  qtd->uk=0;
 
   char *fita = calloc(MAX,sizeof(char));
   int coment = 0;
@@ -97,11 +97,12 @@ void alex(FILE *arquivo,Qtd *qtd){
   
 
   Estado estado = Inicio;
-  while (fgets(fita, sizeof(fita), arquivo) != NULL) {
-
+  while (fgets(fita, MAX, arquivo) != NULL) {
+    int tam = strlen(fita);
+    fita[tam]=' ';
+    fita[tam+1]='\0';
     int currentA = 0;
     while(fita[currentA] != '\0'){
-
       Tipos leitor = verificar(fita[currentA]);
       
       if(estado == Inicio){
@@ -122,9 +123,12 @@ void alex(FILE *arquivo,Qtd *qtd){
           bufferTokens[posicsTokens++] = fita[currentA];
           currentA++;
         }else{
-          if(fita[currentA]!=' ' && fita[currentA]!='\n'){
-            qtd->uk++;
+          if(fita[currentA]!=' ' && fita[currentA]!='\n' && fita[currentA]!='\r' && fita[currentA]!='\t'){
+            qtd->uk++; 
+            bufferTokens[posicsTokens] = '\0';
+            //printf("%s\n",bufferTokens);
           }
+          posicsTokens = 0;
           estado = Inicio;
           currentA++;
         }
@@ -146,17 +150,17 @@ void alex(FILE *arquivo,Qtd *qtd){
         }else{
           bufferTokens[posicsTokens] = '\0';
           qtd->id++;
-          //printf("IDENTIFICADOR:");
-          //printf("%s\n",bufferTokens);
+         //printf("IDENTIFICADOR:");
+         //printf("%s\n",bufferTokens);
           posicsTokens = 0;
           estado = Inicio;
         }
-      }else if(estado == Em_Numero){
+      }else if(estado == Em_Numero){   
         if(leitor == Numero){
           estado = Em_Numero;
           bufferTokens[posicsTokens++] = fita[currentA];
           currentA++;
-        }else if(fita[currentA]=='.' && verificar(fita[currentA+1])==Numero ){
+        }else if(fita[currentA]=='.' && verificar(fita[currentA+1])==Numero ){         
           estado = Em_Numero_Decimal;
           bufferTokens[posicsTokens++] = fita[currentA];
           currentA++;
@@ -245,7 +249,7 @@ void alex(FILE *arquivo,Qtd *qtd){
         if(leitor == Numero){
           estado = Em_Numero_Decimal;
           bufferTokens[posicsTokens++] = fita[currentA];
-          currentA++;
+          currentA++;   
         }else{
           bufferTokens[posicsTokens] = '\0';
           qtd->numb++;
@@ -268,6 +272,8 @@ void alex(FILE *arquivo,Qtd *qtd){
           memcpy(qtd2, qtd, sizeof(Qtd));
           qtd->delim++;
           qtd->op++;
+          //printf("DELIMITER:(");
+          //printf("OPERADOR:*");
           bufferTokens[posicsTokens-1] = '\0';
           estado = Inicio;
           posicsTokens = 0;
@@ -275,9 +281,11 @@ void alex(FILE *arquivo,Qtd *qtd){
           if(coment==1){
             memcpy(qtd, qtd2, sizeof(Qtd));
             qtd->coments++;
-            coment=0;
+            //printf("COMENTARIO:");
           }else{
             qtd->delim++;
+            //printf("OPERADOR:*"); 
+            //printf("DELIMITER:)");
             qtd->op++;
           }
           bufferTokens[posicsTokens-1] = '\0';
@@ -287,12 +295,17 @@ void alex(FILE *arquivo,Qtd *qtd){
       }
     }
   }
+
 }
+
+
 
 
 int main(int argc, char *argv[]) {
   FILE *arquivo;
   Qtd *qtd = malloc(sizeof(Qtd));
+  char caractere = ' '; 
+
 
   if (argc != 2) {
     printf("Uso: %s <nome_do_arquivo>\n", argv[0]);
@@ -300,7 +313,7 @@ int main(int argc, char *argv[]) {
   }
 
   arquivo = fopen(argv[1], "r");
-
+ 
   alex(arquivo,qtd);
 
   printf("KEYWORD: %d\n",qtd->keyword);
