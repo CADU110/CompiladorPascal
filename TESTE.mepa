@@ -1,0 +1,41 @@
+INPP
+AMEM 2
+DSVS L1
+L2: ENPR 1  #proced p
+AMEM 1 
+CRVL 0, 0
+ARMZ 1, 0 #z=x
+CRVL 0, 0
+CRCT 1
+SUBT
+ARMZ 0, 0 #x=x-1
+CRVL 1, 0
+CRCT 1
+
+CMMA #z>1
+DSVF L3
+CHPR L2, 1
+DSVS L4
+
+
+L3: NADA
+CRCT 1
+ARMZ 0, 1 #y=1
+
+
+L4: NADA
+CRVL 0, 1
+CRVL 1, 0 
+MULT
+ARMZ 0, 1 #Y =Y*Z
+DMEM 1
+RTPR 1, 0
+
+L1: NADA
+LEIT
+ARMZ 0, 0 #x=0
+CHPR L2, 0   #chama P
+CRVL 0, 1
+IMPR
+DMEM 2
+PARA

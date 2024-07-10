@@ -4,12 +4,10 @@ var
   a: char;
   m: real;
   b: real;
-
-
 begin
-  readln(c);
-  readln(a);
-  readln(b);
+  read(c);
+  read(a);
+  read(b);
 
   if c = 'C' then
   begin
@@ -33,5 +31,5 @@ begin
       m := ((b - 273.15) * 9 / 5) + 32;
   end;
 
-  writeln(m:0:2);
+  write(m:0:2);
 end.

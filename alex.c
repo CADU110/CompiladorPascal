@@ -31,7 +31,7 @@ typedef enum Tipos{
 typedef struct token{
   Tipos tipo;
   char *token;
-}token;
+}Token;
 
 typedef struct quantidade{
   int keyword;
@@ -81,6 +81,8 @@ void alex(FILE *arquivo,Qtd *qtd){
   char *bufferTokens = calloc(MAX,sizeof(char));
   int posicsTokens = 0;
 
+
+
   qtd->id = 0;
   qtd->keyword = 0;
   qtd->numb = 0;
@@ -93,8 +95,6 @@ void alex(FILE *arquivo,Qtd *qtd){
   char *fita = calloc(MAX,sizeof(char));
   int coment = 0;
   Qtd *qtd2 = malloc(sizeof(Qtd));
-
-  
 
   Estado estado = Inicio;
   while (fgets(fita, MAX, arquivo) != NULL) {
